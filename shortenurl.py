@@ -13,6 +13,7 @@ class ArgumentTypes(Enum):
     PRINT_ALL = 4
     INVALID = 5
     ORIGINAL_URL = 6
+    GET_ORIGINAL_URL = 7
 
 def type_of_argument(argument: str) -> ArgumentTypes:
     if argument[0] == '-':
@@ -27,40 +28,65 @@ def type_of_argument(argument: str) -> ArgumentTypes:
                 return ArgumentTypes.PRINT_ALL
             case 'u':
                 return ArgumentTypes.ORIGINAL_URL
+            case 'g':
+                return ArgumentTypes.GET_ORIGINAL_URL  
     return ArgumentTypes.INVALID
     
 
-number_of_arguments = len(sys.argv)
 
-python_script = sys.argv[0]
-
-argument_flag: str = sys.argv[1]
-
-match type_of_argument(argument_flag):
-    case ArgumentTypes.PRINT_HASHES:
-        print(data.keys())
-        
-    case ArgumentTypes.PRINT_SHORTEN_URLS:
-        ## TODO
-        # Print all the shortened urls.
-        print("All the shortened urls.")
-        
-    case ArgumentTypes.PRINT_ORIGINAL_URLS:
-        print(data.values())
-        
-    case ArgumentTypes.PRINT_ALL:
-        print(data)
+def run(arguments: list[str]):
+    number_of_arguments = len(arguments)
     
-    case ArgumentTypes.ORIGINAL_URL: 
-        if number_of_arguments < 3:
-            print("Please provide a vaild original url.")
-            quit()
-        original_url: str = sys.argv[2]
+    argument_flag: str = arguments[0]
+    
+    match type_of_argument(argument_flag):
+        case ArgumentTypes.PRINT_HASHES:
+            return data.keys()
+            
+        case ArgumentTypes.PRINT_SHORTEN_URLS:
+            ## TODO
+            # Print all the shortened urls.
+            return "All the shortened urls."
+            
+        case ArgumentTypes.PRINT_ORIGINAL_URLS:
+            return data.values()
+            
+        case ArgumentTypes.PRINT_ALL:
+            return data
         
-        ## TODO
-        # Add the hash and original url to the database.
+        case ArgumentTypes.ORIGINAL_URL: 
+            if len(arguments) < 2:
+                return ("Please provide a vaild original url.")
+                # quit()
+            original_url: str = arguments[1]
+            
+            ## TODO
+            # Add the hash and original url to the database.
+            
+            return original_url
         
-        print(original_url)
-        
-    case ArgumentTypes.INVALID:
-        print("Error! Please, enter a valid command")
+        case ArgumentTypes.GET_ORIGINAL_URL:
+            shortened_url = arguments[1]
+            
+            # Use the correct get_hash_from_url
+            def get_hash_from_url(url):
+                url.split('https://soobin.com/')[1]
+            
+            hash_value = get_hash_from_url(shortened_url)
+            
+            return data[hash_value]
+            
+        case ArgumentTypes.INVALID:
+            return "Error! Please, enter a valid command"
+    
+    
+    ## This case should never happpen
+    return None
+
+if __name__ == "__main__":
+    
+    # Name of the python script we are running
+    python_script = sys.argv[0]
+    
+    # Run the script
+    print(run(sys.argv[1:]))
