@@ -13,8 +13,8 @@ class ArgumentTypes(Enum):
     PRINT_ORIGINAL_URLS = 3
     PRINT_ALL = 4
     INVALID = 5
-    ORIGINAL_URL = 6
-    GET_ORIGINAL_URL = 7
+    GET_SHORT_URL_FROM_ORIGINAL = 6
+    GET_ORIGINAL_URL_FROM_SHORT = 7
     GET_COUNT = 8
 
 def type_of_argument(argument: str) -> ArgumentTypes:
@@ -29,9 +29,9 @@ def type_of_argument(argument: str) -> ArgumentTypes:
             case 'a':
                 return ArgumentTypes.PRINT_ALL
             case 'u':
-                return ArgumentTypes.ORIGINAL_URL
+                return ArgumentTypes.GET_SHORT_URL_FROM_ORIGINAL
             case 'g':
-                return ArgumentTypes.GET_ORIGINAL_URL 
+                return ArgumentTypes.GET_ORIGINAL_URL_FROM_SHORT 
             case 'c':
                return ArgumentTypes.GET_COUNT 
     return ArgumentTypes.INVALID
@@ -49,7 +49,7 @@ def run(arguments: list[str]):
         case ArgumentTypes.PRINT_SHORTEN_URLS:
             ## TODO
             # Print all the shortened urls.
-            return [url_shortener.shorten_url(url) for url in data.values()]
+            return [url_shortener.shorten_url(url)[0] for url in data.values()]
             
         case ArgumentTypes.PRINT_ORIGINAL_URLS:
             return data.values()
@@ -57,7 +57,7 @@ def run(arguments: list[str]):
         case ArgumentTypes.PRINT_ALL:
             return data
         
-        case ArgumentTypes.ORIGINAL_URL: 
+        case ArgumentTypes.GET_SHORT_URL_FROM_ORIGINAL: 
             if len(arguments) < 2:
                 return "Please provide a vaild original url."
                 # quit()
@@ -68,19 +68,21 @@ def run(arguments: list[str]):
             
             ## TODO
             # Add the hash and original url to the database and return the short version
-            hash_of_the_url = url_shortener.hash_url(original_url)
+            shortened_url, hash_of_the_url, _ = url_shortener.shorten_url(original_url)
             
-            storage.save_data(original_url, hash_value)
+            # storage.save_data(original_url, hash_of_the_url)
+            
+            return shortened_url
         
-        case ArgumentTypes.GET_ORIGINAL_URL:
+        case ArgumentTypes.GET_ORIGINAL_URL_FROM_SHORT:
             if len(arguments) < 2:
                 return "Please provide a valid short url."
             
             shortened_url = arguments[1]
             
-            hash_value = url_shortener.get_hash_from_url(shortened_url)
+            o_url = url_shortener.expand_url(shortened_url)
             
-            return data[hash_value]
+            return url_shortener.shorten_url(o_url)[1]
             
         case ArgumentTypes.INVALID:
             return "Error! Please, enter a valid command"

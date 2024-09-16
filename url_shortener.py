@@ -32,7 +32,7 @@ def shorten_url(url, id_length=8):
     base_url = "https://myApp.com/"
     
     # Return the shortened URL and the base64-encoded hash (hash key)
-    return f"{base_url}{short_id}", base64_encoded, None
+    return f"{base_url}{short_id}", short_id, None
 
 def expand_url(short_url):
     # Extract the short ID from the URL
