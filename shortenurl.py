@@ -1,7 +1,7 @@
 from enum import Enum
 import sys
 import storage
-
+from urllib.parse import urlparse
 
 data = storage.get_data()
 
@@ -31,8 +31,14 @@ def type_of_argument(argument: str) -> ArgumentTypes:
             case 'g':
                 return ArgumentTypes.GET_ORIGINAL_URL  
     return ArgumentTypes.INVALID
-    
 
+# Return whether or not a url is valid
+def is_valid_url(url) -> bool:
+    try:
+        result = urlparse(url)
+        return all([result.scheme, result.netloc])
+    except AttributeError:
+        return False
 
 def run(arguments: list[str]):
     number_of_arguments = len(arguments)
@@ -56,16 +62,21 @@ def run(arguments: list[str]):
         
         case ArgumentTypes.ORIGINAL_URL: 
             if len(arguments) < 2:
-                return ("Please provide a vaild original url.")
+                return "Please provide a vaild original url."
                 # quit()
             original_url: str = arguments[1]
             
-            ## TODO
-            # Add the hash and original url to the database.
+            if is_valid_url(original_url):
+                return original_url
             
-            return original_url
+            ## TODO
+            # Add the hash and original url to the database and return the short version
+            
+            return "Please provide a valid url"
         
         case ArgumentTypes.GET_ORIGINAL_URL:
+            if len(arguments) < 2:
+                return "Please provide a valid short url."
             shortened_url = arguments[1]
             
             # Use the correct get_hash_from_url
@@ -78,7 +89,6 @@ def run(arguments: list[str]):
             
         case ArgumentTypes.INVALID:
             return "Error! Please, enter a valid command"
-    
     
     ## This case should never happpen
     return None
